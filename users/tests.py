@@ -25,4 +25,3 @@ class PersonCreationTestCase(TestCase):
             username__startswith='jc_').order_by('-username')[0]
         final_index = int(l.username.split('_')[1])
         self.assertEqual(99, final_index)
-        

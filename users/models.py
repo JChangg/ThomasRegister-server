@@ -3,18 +3,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-
-
 class Person(AbstractUser):
     card_id = models.IntegerField(primary_key=True)
     middle_names = models.CharField(max_length=30)
     date_joined = models.DateField(auto_now=True)
     
-    
     def save(self, *args, **kwargs):
         
         if not self.username:
-            initials = '%s'%(self.first_name[0].lower())
+            initials = '%s' % self.first_name[0].lower()
             mn = self.middle_names.split(' ') if self.middle_names else []
             for c in mn: 
                 initials += c[0].lower()
@@ -27,10 +24,6 @@ class Person(AbstractUser):
             else:
                 num = 0
                 
-            self.username = "%s%03d"%(initials, num)
+            self.username = "%s%03d" % (initials, num)
             
-        super(Person,self).save(*args, **kwargs)
-
-    
-
-    
+        super(Person, self).save(*args, **kwargs)

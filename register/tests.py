@@ -2,5 +2,5 @@ from django.test import TestCase
 import models as md
 
 
-class LogCreatioonTest(TestCase):
+class LogCreationTest(TestCase):
     pass
