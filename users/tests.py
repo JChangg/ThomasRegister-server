@@ -6,10 +6,8 @@ class PersonCreationTestCase(TestCase):
     
     def test_username_generation(self):
         person = md.Person(
-            card_id=123456,
-            first_name='Jamie', 
+            first_name='Jamie',
             last_name='Chang',
-            password='Lemon'
         )
         person.save()
         self.assertEqual(person.username, 'jc_000')
@@ -17,10 +15,8 @@ class PersonCreationTestCase(TestCase):
     def test_username_clash_generation(self):
         for i in range(0, 100):
             person = md.Person(
-                card_id=i,
-                first_name='Jamie', 
+                first_name='Jamie',
                 last_name='Chang',
-                password='Lemon'
             )
             person.save()
         l = md.Person.objects.filter(
