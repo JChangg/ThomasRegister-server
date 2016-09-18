@@ -10,5 +10,5 @@
 
 ## Starting from the Terminal
 
-    $ python manage.py runserver $IP:$PORT
+    $ python manage.py runserver 0.0.0.0:8000
     
