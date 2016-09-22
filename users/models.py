@@ -29,11 +29,21 @@ class Person(models.Model):
 
         super(Person, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.username
+
 
 class Card(models.Model):
     id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '%i: %s' % (int(self.id), self.person.__str__())
+
 
 class User(AbstractUser):
     person = models.OneToOneField(Person, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        self.username = self.person.username
+        super(User, self).save(*args, **kwargs)
