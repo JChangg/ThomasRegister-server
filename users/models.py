@@ -3,11 +3,16 @@ from django.contrib.auth.models import AbstractUser, Permission
 from django.db import models
 
 
+class Class(models.Model):
+    name = models.CharField(max_length=30, primary_key=True)
+
+
 class Person(models.Model):
     username = models.SlugField(max_length=30, primary_key=True)
     first_name = models.CharField(max_length=30)
     middle_names = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30)
+    classes = models.ManyToManyField(Class)
 
     def save(self, *args, **kwargs):
 

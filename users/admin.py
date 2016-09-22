@@ -1,9 +1,9 @@
 from django.contrib import admin
-from models import Person, User, Card
+from models import Person, User, Card, Class
 from django.contrib.auth.admin import UserAdmin as UserAdminBuiltIn
 
-admin.site.site_title = 'Tregister'
-admin.site.site_header = 'Tregister'
+admin.site.site_title = 'TRegister'
+admin.site.site_header = 'TRegister'
 
 
 class CardInline(admin.TabularInline):
@@ -63,6 +63,7 @@ class PersonAdmin(admin.ModelAdmin):
     exclude = ('username', )
     search_fields = ['first_name', 'last_name']
 
+
+admin.site.register(Class)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(User, UserAdmin)
-
