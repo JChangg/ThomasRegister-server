@@ -4,14 +4,35 @@ import models as md
 
 class PersonCreationTestCase(TestCase):
     
-    def test_username_generation(self):
+    def test_username_no_mid_generation(self):
+        """ Tests username creation with no middle name"""
         person = md.Person(
             first_name='John',
             last_name='Doe',
         )
         person.save()
+        person.refresh_from_db()
         self.assertEqual(person.username, 'jd_000')
-        
+
+    def test_username_generation(self):
+        person = md.Person(
+            first_name='John',
+            middle_names='Lemon Melon Banana',
+            last_name='Doe',
+        )
+        person.save()
+        person.refresh_from_db()
+        self.assertEqual(person.username, 'jlmbd_000')
+
+    def test_username_no_last_generation(self):
+        """ Tests username creation with no last name"""
+        person = md.Person(
+            first_name='John',
+        )
+        person.save()
+        person.refresh_from_db()
+        self.assertEqual(person.username, 'j_000')
+
     def test_username_clash_generation(self):
         for i in range(0, 100):
             person = md.Person(

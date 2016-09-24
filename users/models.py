@@ -11,7 +11,7 @@ class Person(models.Model):
     username = models.SlugField(max_length=30, primary_key=True)
     first_name = models.CharField(max_length=30)
     middle_names = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30, blank=True)
     classes = models.ManyToManyField(Class)
 
     def save(self, *args, **kwargs):
@@ -21,7 +21,7 @@ class Person(models.Model):
             mn = self.middle_names.split(' ') if self.middle_names else []
             for c in mn:
                 initials += c[0].lower()
-            initials += self.last_name[0].lower()
+            initials += (self.last_name[0].lower() if self.last_name else '')
             initials += '_'
             rs = Person.objects.filter(
                 username__startswith=initials).order_by('-username')
