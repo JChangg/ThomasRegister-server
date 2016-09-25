@@ -7,6 +7,9 @@ class ClassGroup(models.Model):
     id = models.IntegerField(primary_key=True)
     description = models.CharField(max_length=30, unique=True)
 
+    def __str__(self):
+        return self.description
+
 
 class Person(models.Model):
     username = models.SlugField(max_length=30, unique=True)
@@ -14,7 +17,8 @@ class Person(models.Model):
     middle_names = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     groups = models.ManyToManyField(Group, blank=True)
-    class_group = models.ForeignKey(ClassGroup, on_delete=models.CASCADE)
+    class_group = models.ForeignKey(ClassGroup, on_delete=models.CASCADE, blank=True, null=True,
+                                    verbose_name='Year Group / Staff')
 
     def save(self, *args, **kwargs):
 
@@ -43,6 +47,7 @@ class Person(models.Model):
     def __str__(self):
         return self.username
 
+    @property
     def get_name(self):
         name = self.first_name
         name += (' %s' % self.middle_names if self.middle_names else '')
