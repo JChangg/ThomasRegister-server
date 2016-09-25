@@ -8,7 +8,7 @@ class Class(models.Model):
 
 
 class Person(models.Model):
-    username = models.SlugField(max_length=30, primary_key=True)
+    username = models.SlugField(max_length=30, unique=True)
     first_name = models.CharField(max_length=30)
     middle_names = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
@@ -30,7 +30,7 @@ class Person(models.Model):
             else:
                 num = 0
 
-            self.username = "%s%03d" % (initials, num)
+            self.username = u"%s%03d" % (initials, num)
 
         super(Person, self).save(*args, **kwargs)
 

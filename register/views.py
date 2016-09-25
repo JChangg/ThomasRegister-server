@@ -1,15 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from models import Log
-from users.models import Person
 
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the logging index.")
-
-
-def log(request, card_id):
-    registered_person = Person.objects.get(pk=card_id)
-    new_log = Log(person=registered_person)
-    new_log.save()
-    return HttpResponse("Logged %i: %s" % (card_id, registered_person.username))
+def register_list(request):
+    qs = Log.objects.all()
+    if request.is_ajax():
+        return JsonResponse(qs)
+    else:
+        context = {'title': 'Logs'}
+        return render(request, 'logs.html', context=context)
