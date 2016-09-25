@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Has Login?</th>
+        </tr>
+        (% for person in object_list %}
+        <tr>
+            <td>{% person.username %]</td>
+            <td>{% person.first_name %}</td>
+            <td>{% person.last_name %}</td>
+            {% if person.user %}
+            <td>Y</td>
+            {% else %}
+            <td>N</td>
+            {% endif %}
+        </tr>
+        (% endfor %}
+    </table>
+</body>
+</html>
