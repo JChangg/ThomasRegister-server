@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import Person, User, Card, Class
+from models import Person, User, Card
 from django.contrib.auth.admin import UserAdmin as UserAdminBuiltIn
 
 admin.site.site_title = 'TRegister'
@@ -28,8 +28,7 @@ class UserAdmin(UserAdminBuiltIn):
                 'is_active',
                 'is_superuser',
                 'is_staff',
-                'groups',
-                'user_permissions'
+                'user_permissions',
             ),
         }),
     )
@@ -64,6 +63,5 @@ class PersonAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name']
 
 
-admin.site.register(Class)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(User, UserAdmin)

@@ -88,6 +88,7 @@ class UserTestFCase(TestCase):
             last_name="Doe",
         )
         self.person.save()
+        self.person.refresh_from_db()
         self.user = md.User(
             person=self.person
         )
@@ -95,3 +96,12 @@ class UserTestFCase(TestCase):
 
     def test_username_auto_assigned(self):
         self.assertEqual(self.user.username, self.person.username)
+
+    def test_username_update_assigned(self):
+        """ changing the username in person should update that of user"""
+        self.person.username = "abc_123"
+        self.person.save()
+        self.person.refresh_from_db()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, self.person.username)
+

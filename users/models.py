@@ -1,10 +1,6 @@
 from __future__ import unicode_literals
-from django.contrib.auth.models import AbstractUser, Permission
+from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
-
-
-class Class(models.Model):
-    name = models.CharField(max_length=30, primary_key=True)
 
 
 class Person(models.Model):
@@ -12,7 +8,7 @@ class Person(models.Model):
     first_name = models.CharField(max_length=30)
     middle_names = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
-    classes = models.ManyToManyField(Class)
+    groups = models.ManyToManyField(Group)
 
     def save(self, *args, **kwargs):
 
@@ -34,6 +30,10 @@ class Person(models.Model):
 
         super(Person, self).save(*args, **kwargs)
 
+        user = User.objects.filter(person=self).first()
+        if user:
+            user.save()
+
     def __str__(self):
         return self.username
 
@@ -51,4 +51,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         self.username = self.person.username
+        super(User, self).save(*args, **kwargs)
+        for g in self.person.groups.all():
+            self.groups.add(g)
         super(User, self).save(*args, **kwargs)
