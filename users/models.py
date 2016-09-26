@@ -1,14 +1,8 @@
 from __future__ import unicode_literals
 from django.contrib.auth.models import AbstractUser, Group
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.db import models
-
-
-class ClassGroup(models.Model):
-    id = models.IntegerField(primary_key=True)
-    description = models.CharField(max_length=30, unique=True)
-
-    def __str__(self):
-        return self.description
 
 
 class Person(models.Model):
@@ -16,13 +10,11 @@ class Person(models.Model):
     first_name = models.CharField(max_length=30)
     middle_names = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
-    groups = models.ManyToManyField(Group, blank=True)
-    class_group = models.ForeignKey(
-        ClassGroup,
-        blank=True,
+    group = models.ForeignKey(
+        Group,
         null=True,
-        on_delete=models.CASCADE,
-        verbose_name='Year Group / Staff'
+        blank=True,
+        on_delete=models.SET_NULL,
     )
 
     def save(self, *args, **kwargs):
@@ -44,10 +36,6 @@ class Person(models.Model):
             self.username = u"%s%03d" % (initials, num)
 
         super(Person, self).save(*args, **kwargs)
-
-        user = User.objects.filter(person=self).first()
-        if user:
-            user.save()
 
     def __str__(self):
         return self.username
@@ -74,6 +62,18 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         self.username = self.person.username
         super(User, self).save(*args, **kwargs)
-        for g in self.person.groups.all():
-            self.groups.add(g)
+        if self.person.group:
+            self.groups.add(self.person.group)
         super(User, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Person)
+def person_post_save(sender, **kwargs):
+    person = kwargs.get('instance')
+    u = User.objects.filter(person=person)
+    if len(u) == 1:
+        user = u[0]
+        if person.group:
+            user.groups.add(person.group)
+        user.username = person.username
+        user.save()

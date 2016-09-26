@@ -1,19 +1,9 @@
 from django.contrib import admin
-from models import Person, User, Card, ClassGroup
-from register.models import Log
+from models import Person, User, Card
 from django.contrib.auth.admin import UserAdmin as UserAdminBuiltIn
 
 admin.site.site_title = 'TRegister'
 admin.site.site_header = 'TRegister'
-
-
-class LogInline(admin.StackedInline):
-    model = Log
-    extra = 0
-
-class ClassGroupInline(admin.TabularInline):
-    model = ClassGroup
-    exclude = ('id', )
 
 
 class CardInline(admin.TabularInline):
@@ -65,7 +55,6 @@ class PersonAdmin(admin.ModelAdmin):
     inlines = [
         CardInline,
         UserInline,
-        LogInline,
     ]
 
     list_display = ('username', 'first_name', 'last_name')
@@ -76,4 +65,3 @@ class PersonAdmin(admin.ModelAdmin):
 
 admin.site.register(Person, PersonAdmin)
 admin.site.register(User, UserAdmin)
-admin.site.register(ClassGroup)
