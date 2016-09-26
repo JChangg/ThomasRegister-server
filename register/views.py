@@ -1,11 +1,11 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from models import Log
-from users.models import Person, Card
+from users.models import Card
 import json
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet, RawQuerySet
+# from django.contrib.auth.decorators import login_required
 
 
 class QSJSONEncoder(DjangoJSONEncoder):
@@ -16,6 +16,7 @@ class QSJSONEncoder(DjangoJSONEncoder):
         return super(QSJSONEncoder, self).default(obj)
 
 
+# @login_required
 def authenticate_user(request, id):
     cards = Card.objects.filter(id=id)
     if len(cards) > 0:
@@ -29,16 +30,9 @@ def authenticate_user(request, id):
             'time': log.time,
             'name': person.get_name(),
             'groups': person.groups.all(),
+            'class': person.class_group,
         }
     else:
         data = {}
     return HttpResponse(json.dumps(data, cls=QSJSONEncoder),
                         content_type="application/json")
-
-# def register_list(request):
-#     qs = Log.objects.all()
-#     if request.is_ajax():
-#         return JsonResponse(qs)
-#     else:
-#         context = {'title': 'Logs'}
-#         return render(request, 'logs.html', context=context)

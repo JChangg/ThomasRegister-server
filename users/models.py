@@ -17,8 +17,13 @@ class Person(models.Model):
     middle_names = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     groups = models.ManyToManyField(Group, blank=True)
-    class_group = models.ForeignKey(ClassGroup, on_delete=models.CASCADE, blank=True, null=True,
-                                    verbose_name='Year Group / Staff')
+    class_group = models.ForeignKey(
+        ClassGroup,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name='Year Group / Staff'
+    )
 
     def save(self, *args, **kwargs):
 
