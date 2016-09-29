@@ -1,38 +1,30 @@
-from django.http import HttpResponse
-from models import Log
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from register.serializers import LogSerializer
+from users.serializers import CardSerializer
 from users.models import Card
-import json
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models.query import QuerySet, RawQuerySet
-# from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-class QSJSONEncoder(DjangoJSONEncoder):
-    """ json.JSONEncoder extension: handle querysets """
-    def default(self, obj):
-        if isinstance(obj, QuerySet) or isinstance(obj, RawQuerySet):
-            return serializers.serialize('python', obj, ensure_ascii=False)
-        return super(QSJSONEncoder, self).default(obj)
+@csrf_exempt
+@api_view(['GET'])
+def validate(_, pk):
+    card = get_object_or_404(Card, pk=pk)
+    card_serializer = CardSerializer(card)
+    return JsonResponse(card_serializer.data, status=200)
 
 
-# @login_required
-def authenticate_user(request, id):
-    cards = Card.objects.filter(id=id)
-    if len(cards) > 0:
-        card = cards[0]
-        person = card.person
-        log = Log(person=person)
-        log.save()
-        log.refresh_from_db()
-        data = {
-            'cardID': card.id,
-            'time': log.time,
-            'name': person.get_name(),
-            'groups': person.groups.all(),
-            'class': person.class_group,
-        }
-    else:
-        data = {}
-    return HttpResponse(json.dumps(data, cls=QSJSONEncoder),
-                        content_type="application/json")
+@csrf_exempt
+@api_view(['POST'])
+def register(request):
+    log_serializer = LogSerializer(data=request.data)
+    if log_serializer.is_valid():
+        logger.debug(log_serializer)
+        log_serializer.save()
+
+        return JsonResponse(log_serializer.data, status=201)
+    return JsonResponse(log_serializer.errors, status=400)
