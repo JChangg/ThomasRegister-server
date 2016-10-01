@@ -1,0 +1,6 @@
+.idea
+*.pyc
+users/migrations/*
+register/migrations/*
+
+!__init__.py
