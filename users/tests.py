@@ -2,6 +2,45 @@ from django.test import TestCase
 import models as md
 
 
+class UsernameCreationTestCase(TestCase):
+    
+    def setUp(self):
+        self.first_name = 'John'
+        self.middle_names = 'Wait For It'
+        self.last_name = 'Doe'
+    
+    def test_initials_first(self):
+        initials = md.get_initials(self.first_name)
+        self.assertEqual(initials, 'j')
+        
+    def test_initials_first_middle(self):
+        initials = md.get_initials(
+            self.first_name,
+            middle_names=self.middle_names
+        )
+        self.assertEqual(initials, 'jwfi')
+        
+    def test_initials_whole(self):
+        initials = md.get_initials(
+            self.first_name,
+            middle_names=self.middle_names,
+            last_name=self.last_name,
+        )
+        self.assertEqual(initials, 'jwfid')
+        
+    def test_initials_first_last(self):
+        initials = md.get_initials(
+            self.first_name,
+            last_name=self.last_name,
+        )
+        self.assertEqual(initials, 'jd')
+        
+    def test_username_single(self):
+        initials = 'jwfid'
+        name = md.username_generator(initials)
+        self.assertEqual(name, 'jwfid_000')
+        
+
 class PersonCreationTestCase(TestCase):
     
     def test_username_no_mid_generation(self):
@@ -104,4 +143,19 @@ class UserTestFCase(TestCase):
         self.person.refresh_from_db()
         self.user.refresh_from_db()
         self.assertEqual(self.user.username, self.person.username)
-
+    
+    def test_username_default(self):
+        """ if person is not supplied, expect e.g. user_000 """
+        user = md.User()
+        user.save()
+        user.refresh_from_db()
+        self.assertEqual(user.username, 'user_000')
+        
+    def test_username_machine(self):
+        """ Username for machines should be auto generated """
+        user = md.User(
+            is_machine=True
+        )
+        user.save()
+        user.refresh_from_db()
+        self.assertEqual(user.username, 'machine_000')

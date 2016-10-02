@@ -3,6 +3,27 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import models
+import names
+
+
+def get_initials(first_name, middle_names=None, last_name=None):
+    initials = '%s' % first_name[0].lower()
+    mn = middle_names.split(' ') if middle_names else []
+    for c in mn:
+        initials += c[0].lower()
+    initials += (last_name[0].lower() if last_name else '')
+    return initials
+
+
+def username_generator(initials):
+    rs = Person.objects.filter(
+        username__startswith=initials).order_by('-username')
+    if len(rs) != 0:
+        num = int(rs[0].username.split('_')[1]) + 1
+    else:
+        num = 0
+
+    return u"%s_%03d" % (initials, num)
 
 
 class Person(models.Model):
@@ -20,20 +41,12 @@ class Person(models.Model):
     def save(self, *args, **kwargs):
 
         if not self.username:
-            initials = '%s' % self.first_name[0].lower()
-            mn = self.middle_names.split(' ') if self.middle_names else []
-            for c in mn:
-                initials += c[0].lower()
-            initials += (self.last_name[0].lower() if self.last_name else '')
-            initials += '_'
-            rs = Person.objects.filter(
-                username__startswith=initials).order_by('-username')
-            if len(rs) != 0:
-                num = int(rs[0].username.split('_')[1]) + 1
-            else:
-                num = 0
-
-            self.username = u"%s%03d" % (initials, num)
+            initials = get_initials(
+                self.first_name,
+                middle_names=self.middle_names,
+                last_name=self.last_name,
+            )
+            self.username = username_generator(initials)
 
         super(Person, self).save(*args, **kwargs)
 
@@ -58,11 +71,19 @@ class Card(models.Model):
 
 class User(AbstractUser):
     person = models.OneToOneField(Person, null=True, on_delete=models.SET_NULL)
-
+    is_machine = models.BooleanField(default=False)
+    
     def save(self, *args, **kwargs):
-        self.username = self.person.username
+        if not self.username:
+            if self.is_machine:
+                self.username = username_generator('machine')
+            elif self.person:        
+                self.username = self.person.username
+            else:
+                self.username = username_generator('user')
+            
         super(User, self).save(*args, **kwargs)
-        if self.person.group:
+        if self.person and self.person.group:
             self.groups.add(self.person.group)
         super(User, self).save(*args, **kwargs)
 
