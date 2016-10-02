@@ -57,7 +57,7 @@ class Card(models.Model):
 
 
 class User(AbstractUser):
-    person = models.OneToOneField(Person, on_delete=models.CASCADE)
+    person = models.OneToOneField(Person, null=True, on_delete=models.SET_NULL)
 
     def save(self, *args, **kwargs):
         self.username = self.person.username
